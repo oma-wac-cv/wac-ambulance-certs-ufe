@@ -6,31 +6,13 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
-    interface MyComponent {
-        /**
-          * The first name
-         */
-        "first": string;
-        /**
-          * The last name
-         */
-        "last": string;
-        /**
-          * The middle name
-         */
-        "middle": string;
-    }
     interface OmaAmbulanceCertsApp {
         "apiBase": string;
         "basePath": string;
     }
-    interface OmaAmbulanceCertsCertsEdit {
-    }
     interface OmaAmbulanceCertsList {
         "apiBase": string;
         "certificationId": string;
-    }
-    interface OmaAmbulanceCertsUserEdit {
     }
     interface OmaAmbulanceCertsUserList {
         "apiBase": string;
@@ -42,23 +24,11 @@ export interface OmaAmbulanceCertsListCustomEvent<T> extends CustomEvent<T> {
     target: HTMLOmaAmbulanceCertsListElement;
 }
 declare global {
-    interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
-    }
-    var HTMLMyComponentElement: {
-        prototype: HTMLMyComponentElement;
-        new (): HTMLMyComponentElement;
-    };
     interface HTMLOmaAmbulanceCertsAppElement extends Components.OmaAmbulanceCertsApp, HTMLStencilElement {
     }
     var HTMLOmaAmbulanceCertsAppElement: {
         prototype: HTMLOmaAmbulanceCertsAppElement;
         new (): HTMLOmaAmbulanceCertsAppElement;
-    };
-    interface HTMLOmaAmbulanceCertsCertsEditElement extends Components.OmaAmbulanceCertsCertsEdit, HTMLStencilElement {
-    }
-    var HTMLOmaAmbulanceCertsCertsEditElement: {
-        prototype: HTMLOmaAmbulanceCertsCertsEditElement;
-        new (): HTMLOmaAmbulanceCertsCertsEditElement;
     };
     interface HTMLOmaAmbulanceCertsListElementEventMap {
         "error-event": string;
@@ -77,12 +47,6 @@ declare global {
         prototype: HTMLOmaAmbulanceCertsListElement;
         new (): HTMLOmaAmbulanceCertsListElement;
     };
-    interface HTMLOmaAmbulanceCertsUserEditElement extends Components.OmaAmbulanceCertsUserEdit, HTMLStencilElement {
-    }
-    var HTMLOmaAmbulanceCertsUserEditElement: {
-        prototype: HTMLOmaAmbulanceCertsUserEditElement;
-        new (): HTMLOmaAmbulanceCertsUserEditElement;
-    };
     interface HTMLOmaAmbulanceCertsUserListElement extends Components.OmaAmbulanceCertsUserList, HTMLStencilElement {
     }
     var HTMLOmaAmbulanceCertsUserListElement: {
@@ -90,52 +54,28 @@ declare global {
         new (): HTMLOmaAmbulanceCertsUserListElement;
     };
     interface HTMLElementTagNameMap {
-        "my-component": HTMLMyComponentElement;
         "oma-ambulance-certs-app": HTMLOmaAmbulanceCertsAppElement;
-        "oma-ambulance-certs-certs-edit": HTMLOmaAmbulanceCertsCertsEditElement;
         "oma-ambulance-certs-list": HTMLOmaAmbulanceCertsListElement;
-        "oma-ambulance-certs-user-edit": HTMLOmaAmbulanceCertsUserEditElement;
         "oma-ambulance-certs-user-list": HTMLOmaAmbulanceCertsUserListElement;
     }
 }
 declare namespace LocalJSX {
-    interface MyComponent {
-        /**
-          * The first name
-         */
-        "first"?: string;
-        /**
-          * The last name
-         */
-        "last"?: string;
-        /**
-          * The middle name
-         */
-        "middle"?: string;
-    }
     interface OmaAmbulanceCertsApp {
         "apiBase"?: string;
         "basePath"?: string;
-    }
-    interface OmaAmbulanceCertsCertsEdit {
     }
     interface OmaAmbulanceCertsList {
         "apiBase"?: string;
         "certificationId"?: string;
         "onError-event"?: (event: OmaAmbulanceCertsListCustomEvent<string>) => void;
     }
-    interface OmaAmbulanceCertsUserEdit {
-    }
     interface OmaAmbulanceCertsUserList {
         "apiBase"?: string;
         "userId"?: string;
     }
     interface IntrinsicElements {
-        "my-component": MyComponent;
         "oma-ambulance-certs-app": OmaAmbulanceCertsApp;
-        "oma-ambulance-certs-certs-edit": OmaAmbulanceCertsCertsEdit;
         "oma-ambulance-certs-list": OmaAmbulanceCertsList;
-        "oma-ambulance-certs-user-edit": OmaAmbulanceCertsUserEdit;
         "oma-ambulance-certs-user-list": OmaAmbulanceCertsUserList;
     }
 }
@@ -143,11 +83,8 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
             "oma-ambulance-certs-app": LocalJSX.OmaAmbulanceCertsApp & JSXBase.HTMLAttributes<HTMLOmaAmbulanceCertsAppElement>;
-            "oma-ambulance-certs-certs-edit": LocalJSX.OmaAmbulanceCertsCertsEdit & JSXBase.HTMLAttributes<HTMLOmaAmbulanceCertsCertsEditElement>;
             "oma-ambulance-certs-list": LocalJSX.OmaAmbulanceCertsList & JSXBase.HTMLAttributes<HTMLOmaAmbulanceCertsListElement>;
-            "oma-ambulance-certs-user-edit": LocalJSX.OmaAmbulanceCertsUserEdit & JSXBase.HTMLAttributes<HTMLOmaAmbulanceCertsUserEditElement>;
             "oma-ambulance-certs-user-list": LocalJSX.OmaAmbulanceCertsUserList & JSXBase.HTMLAttributes<HTMLOmaAmbulanceCertsUserListElement>;
         }
     }
