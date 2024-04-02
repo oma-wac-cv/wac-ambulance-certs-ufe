@@ -1,0 +1,11 @@
+:host {
+  display: block;
+}
+
+:root {
+  --md-sys-color-surface-container-high: #e3e9e9;
+  --md-sys-color-primary: #006a6a;
+  --md-fab-container-shape: 0px;
+  --md-fab-icon-size: 36px;
+  background-color: #f4fbfa;
+}

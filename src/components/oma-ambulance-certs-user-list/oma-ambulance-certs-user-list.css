@@ -1,0 +1,18 @@
+:host {
+  display: block;
+}
+
+:root {
+  --md-sys-color-primary: #006a6a;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-on-surface-variant: #3f4948;
+
+  /* Component tokens */
+  --md-checkbox-container-shape: 0px;
+}
+
+.cert-edit {
+  display: flex;
+  align-items: center; /* Centers vertically */
+}
+
