@@ -1,4 +1,4 @@
-import { Component, Prop, State, Event, Host, h } from '@stencil/core';
+import { Component, Prop, State, Host, h } from '@stencil/core';
 import { AmbulanceStaffCertificationsApiFactory, User, UserCertification, Certification } from '../../api/ambulance-certs';
 
 @Component({
@@ -33,19 +33,10 @@ export class OmaAmbulanceCertsUserList {
     return this.certifications.find(cert => cert.id === userCert.certification_id);
   }
 
-  private openDialog(user: User, cert: UserCertification, event: Event) {
+  private openDialog(user: User, cert: UserCertification) {
     this.userEdit = user;
     this.certEdit = this.certifications.find(c => c.id === cert.certification_id);
     this.dialog.show();
-  }
-
-  private isCertSelected(cert: Certification) {
-    if (!this.userEdit || !this.userEdit.certifications) {
-      return false;
-    }
-    const is_selected = this.userEdit.certifications.find(
-    userCert => (userCert as any).certification_id === cert.id) !== undefined;
-    return is_selected;
   }
 
   async componentWillLoad() {
@@ -103,10 +94,6 @@ export class OmaAmbulanceCertsUserList {
     this.dialog.close();
   }
 
-  private onCertSelect(cert: string, event: Event) {
-    this.expanded = this.expanded === cert ? "" : cert;
-  }
-
   render() {
     if (this.error) {
       return (
@@ -128,7 +115,7 @@ export class OmaAmbulanceCertsUserList {
                     <md-assist-chip
                       always-focusable
                       disabled
-                      onClick={(evt) => this.openDialog(user, cert, evt)}
+                      onClick={() => this.openDialog(user, cert)}
                       label={this.getCertFromUserCertification(cert).name || "Unknown"}>
                     </md-assist-chip>
                   )}
@@ -206,7 +193,7 @@ export class OmaAmbulanceCertsUserList {
                     <br></br>
 
                     <md-filled-tonal-icon-button
-                      onClick={(evt) => {
+                      onClick={() => {
                         this.userCertifications = this.userCertifications.filter(
                           c => c.certification_id !== cert.certification_id
                         );

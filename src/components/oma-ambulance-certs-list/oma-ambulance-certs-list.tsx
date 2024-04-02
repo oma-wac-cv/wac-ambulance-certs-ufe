@@ -72,14 +72,6 @@ export class OmaAmbulanceCertsList {
     }
   }
 
-  private resetCertEdit() {
-    this.newCert = {
-      authority: "",
-      name: "",
-      description: ""
-    };
-  }
-
   private async deleteCertification(cert: Certification) {
     try {
       const api = AmbulanceStaffCertificationsApiFactory(undefined, this.apiBase);
