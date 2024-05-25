@@ -80,7 +80,7 @@ export class OmaAmbulanceCertsList {
       <Host>
         <div class="mylist">
           <md-list>
-            {this.certifications.map(cert =>
+            {this.certifications?.map(cert =>
               <md-list-item>
                 <div slot="headline">Name: ({cert.authority}) {cert.name}</div>
                 <div slot="supporting-text">Description: {cert.description}</div>

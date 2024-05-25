@@ -35,7 +35,7 @@ export class OmaAmbulanceCertsUserList {
       <Host>
         <div class="mylist">
           <md-list>
-            {this.users.map(user =>
+            {this.users?.map(user =>
               <md-list-item>
                 <div slot="headline">{user.name}</div>
                 <div slot="supporting-text">

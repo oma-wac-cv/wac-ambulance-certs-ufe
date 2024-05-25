@@ -76,7 +76,7 @@ export class OmaAmbulanceCertsUserEdit {
                   this.elementCertSelect = (e.target as HTMLSelectElement).value;
                   }
                 }
-              >{this.certifications.map(cert =>
+              >{this.certifications?.map(cert =>
                   <md-select-option value={cert.id}>
                     <div slot="headline">{cert.name}</div>
                   </md-select-option>
