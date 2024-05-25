@@ -1,5 +1,5 @@
 import { Component, Prop, State, Event, EventEmitter, Host, h } from '@stencil/core';
-import { AmbulanceStaffCertificationsApiFactory, User, UserCertification, Certification } from '../../api/ambulance-certs';
+import { AmbulanceStaffCertificationsApiFactory, User, Certification } from '../../api/ambulance-certs';
 
 @Component({
   tag: 'oma-ambulance-certs-user-edit',
@@ -29,7 +29,7 @@ export class OmaAmbulanceCertsUserEdit {
 
   error: string = "";
 
-  private async componentWillLoad() {
+  async componentWillLoad() {
     if (typeof this.user === "string") {
       this.userEdit = JSON.parse(this.user);
     } else {

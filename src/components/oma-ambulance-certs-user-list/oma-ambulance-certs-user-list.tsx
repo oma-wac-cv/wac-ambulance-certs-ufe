@@ -1,5 +1,5 @@
 import { Component, Prop, State, Event, EventEmitter, Host, h } from '@stencil/core';
-import { AmbulanceStaffCertificationsApiFactory, User, UserCertification, Certification } from '../../api/ambulance-certs';
+import { User, Certification } from '../../api/ambulance-certs';
 
 @Component({
   tag: 'oma-ambulance-certs-user-list',

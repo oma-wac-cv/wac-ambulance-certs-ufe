@@ -1,5 +1,5 @@
 import { Component, Host, Prop, State, h } from '@stencil/core';
-import { AmbulanceStaffCertificationsApiFactory, User, UserCertification, Certification } from '../../api/ambulance-certs';
+import { AmbulanceStaffCertificationsApiFactory, User, Certification } from '../../api/ambulance-certs';
 
 declare global {
   interface Window { navigation: any; }
