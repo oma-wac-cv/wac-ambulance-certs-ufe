@@ -11,8 +11,10 @@ export class OmaAmbulanceCertsList {
   @Prop() certificationId: string = "";
 
   @Event({eventName: "error-event"}) errorEvent: EventEmitter<string>;
+  @Event({eventName: "action-event"}) actionEvent: EventEmitter<string>;
 
-  @State() certifications: Certification[] = [];
+  @Prop() certifications: Certification[] = [];
+
   @State() newCert: Certification = {
     authority: "",
     name: "",
@@ -22,26 +24,8 @@ export class OmaAmbulanceCertsList {
   private error: string = "";
   private dialog: any = null;
 
-  private async getCertifications(): Promise<Certification[]> {
-    try {
-      const api = AmbulanceStaffCertificationsApiFactory(undefined, this.apiBase);
-      const response = await api.getCertifications();
-      if (response.status !== 200) {
-        this.error = `Error: ${response.statusText}`;
-        this.errorEvent.emit(this.error);
-        return [];
-      }
-
-      return response.data;
-    } catch (e) {
-      this.error = `Error: ${e}`;
-      this.errorEvent.emit(this.error);
-      return [];
-    }
-  }
-
   async componentWillLoad() {
-    this.certifications = await this.getCertifications()
+
   }
 
   private async addCertification() {
@@ -51,23 +35,23 @@ export class OmaAmbulanceCertsList {
       const api = AmbulanceStaffCertificationsApiFactory(undefined, this.apiBase);
       const response = await api.addCertification(cert);
 
-      if (response.status !== 200) {
-        this.error = `Error: ${response.statusText}`;
+      if (response.status !== 201) {
+        this.error = `[ERR!] cannot add certification: ${response.statusText}`;
         this.errorEvent.emit(this.error);
         return;
       }
 
       cert.id = response.data.id;
-      this.certifications = [...this.certifications, cert];
       this.dialog?.close();
       this.newCert = {
         authority: "",
         name: "",
         description: ""
       };
+      this.actionEvent.emit("add");
 
-    } catch (e) {
-      this.error = `Error: ${e}`;
+     } catch (e) {
+      this.error = `[ERR!] cannot add certification: ${e}`;
       this.errorEvent.emit(this.error);
     }
   }
@@ -78,7 +62,7 @@ export class OmaAmbulanceCertsList {
       const response = await api.deleteCertification(cert.id);
 
       if (response.status !== 204) {
-        this.error = `Error: ${response.statusText}`;
+        this.error = `[ERR!] cannot delete certification: ${response.statusText}`;
         this.errorEvent.emit(this.error);
         return;
       }
@@ -94,21 +78,28 @@ export class OmaAmbulanceCertsList {
   render() {
     return (
       <Host>
-        <md-list>
-          {this.certifications.map(cert =>
-            <md-list-item>
-              <div slot="headline">{cert.authority}: {cert.name}</div>
-              <div slot="supporting-text">Popis: {cert.description}</div>
-              <md-icon slot="start">workspace_premium</md-icon>
-              <md-filled-tonal-icon-button slot="end" onClick={() => this.deleteCertification(cert)}>
-                <md-icon>close</md-icon>
-              </md-filled-tonal-icon-button>
-            </md-list-item>
-          )}
-        </md-list>
-        <md-fab size="small" aria-label="Edit" onClick={() => this.dialog?.show()}>
-          <md-icon slot="icon">add</md-icon>
-        </md-fab>
+        <div class="mylist">
+          <md-list>
+            {this.certifications.map(cert =>
+              <md-list-item>
+                <div slot="headline">Name: ({cert.authority}) {cert.name}</div>
+                <div slot="supporting-text">Description: {cert.description}</div>
+                <md-icon slot="start">workspace_premium</md-icon>
+                <md-filled-tonal-button slot="end" onClick={() => this.deleteCertification(cert)}>
+                  Delete
+                  <md-icon slot="icon">close</md-icon>
+                </md-filled-tonal-button>
+              </md-list-item>
+            )}
+          </md-list>
+        </div>
+
+        <div class="button-add">
+          <md-filled-tonal-button slot="end" onClick={() => this.dialog?.show()}>
+            Add new certification
+            <md-icon slot="icon">add</md-icon>
+          </md-filled-tonal-button>
+        </div>
 
         <md-dialog ref={(el) => this.dialog = el as any}>
           <div slot="title">Add new certification</div>
@@ -126,6 +117,8 @@ export class OmaAmbulanceCertsList {
             <md-outlined-text-field label="Description"
               value={this.newCert.description}
               oninput={(e) => this.newCert.description = (e.target as HTMLInputElement).value}
+              rows="3"
+              type="textarea"
             />
             <br></br>
           </div>

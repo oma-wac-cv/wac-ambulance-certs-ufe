@@ -1,5 +1,10 @@
 :host {
+  margin-top: 100px;
   display: block;
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
 }
 
 :root {
@@ -16,3 +21,24 @@
   align-items: center; /* Centers vertically */
 }
 
+
+:root {
+  --md-sys-color-surface-container-high: #e3e9e9;
+  --md-sys-color-primary: #006a6a;
+  --md-fab-container-shape: 0px;
+  --md-fab-icon-size: 36px;
+  background-color: #f4fbfa;
+}
+
+
+.mylist {
+  max-width: 1200px;
+  border: 2px solid black;
+}
+
+.button-add {
+  position: fixed;
+  bottom: 0px;
+  right: 0px;
+  padding: 10px;
+}

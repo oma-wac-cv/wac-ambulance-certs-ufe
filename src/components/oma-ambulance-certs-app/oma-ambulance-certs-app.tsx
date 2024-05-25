@@ -1,5 +1,5 @@
 import { Component, Host, Prop, State, h } from '@stencil/core';
-
+import { AmbulanceStaffCertificationsApiFactory, User, UserCertification, Certification } from '../../api/ambulance-certs';
 
 declare global {
   interface Window { navigation: any; }
@@ -18,10 +18,58 @@ export class OmaAmbulanceCertsApp {
   @State() private relativePath: string = "";
 
   private element: string = "404";
-  private entryId: string = "404";
-  private error:   string = "";
+  private entryId: string = "";
+  @State() error: string = "";
+  private user: User = {
+    id: "",
+    name: "",
+    certifications: []
+  };
 
-  componentWillLoad() {
+  @State() userList: User[] = [];
+  @State() certificationList: Certification[] = [];
+
+  private navigate(path: string) {
+    const absolute = new URL(path, new URL(this.basePath, document.baseURI)).pathname;
+    if (window.navigation === undefined) {
+      return;
+    }
+    window.navigation.navigate(absolute);
+    this.getRouterElements();
+  }
+
+  private async getUsers(): Promise<User[]> {
+    try {
+      const api = AmbulanceStaffCertificationsApiFactory(undefined, this.apiBase);
+      const response = await api.getUsers();
+      if (response.status !== 200) {
+        this.error = `[ERR!] cannot fetch users: ${response.statusText}`;
+        return [];
+      }
+      return JSON.parse(JSON.stringify(response.data));
+    } catch (e) {
+      this.error = `[ERR!] cannot fetch users: ${e}`;
+      return JSON.parse(JSON.stringify([]));
+    }
+  }
+
+  private async getCertifications(): Promise<Certification[]> {
+    try {
+      const api = AmbulanceStaffCertificationsApiFactory(undefined, this.apiBase);
+      const response = await api.getCertifications();
+      if (response.status !== 200) {
+        this.error = `[ERR!] cannot fetch certifications: ${response.statusText}`;
+        return [];
+      }
+
+      return JSON.parse(JSON.stringify(response.data));
+    } catch (e) {
+      this.error = `[ERR!] cannot fetch certifications: ${e}`;
+      return JSON.parse(JSON.stringify([]));
+    }
+  }
+
+  async componentWillLoad() {
     const baseUri = new URL(this.basePath, document.baseURI || "/").pathname;
 
     const toRelative = (path: string) => {
@@ -38,7 +86,17 @@ export class OmaAmbulanceCertsApp {
       let path = new URL((ev as any).destination.url).pathname;
       toRelative(path);
     });
+
+    this.userList = await this.getUsers();
+    this.certificationList = await this.getCertifications();
+
     toRelative(location.pathname);
+    this.navigate(this.relativePath);
+  }
+
+  private async refreshData() {
+    this.userList = JSON.parse(JSON.stringify(await this.getUsers()));
+    this.certificationList = JSON.parse(JSON.stringify(await this.getCertifications()));
   }
 
   private getRouterElements() {
@@ -60,6 +118,12 @@ export class OmaAmbulanceCertsApp {
       element = (entryId === undefined) ? "user-list" : "user-edit";
       this.element = element
       this.entryId = entryId === undefined ? "@new" : entryId;
+      if (this.element == "user-edit") {
+        let found: User = this.userList.find(user => user.id === this.entryId);
+        if (found) {
+          this.user = found;
+        }
+      }
       return;
     }
 
@@ -71,12 +135,34 @@ export class OmaAmbulanceCertsApp {
     }
 
     this.element = "404";
-    this.entryId = "404";
+    this.entryId = "";
     return
   }
 
+
   private onChildError(evt: Event) {
     this.error = (evt as CustomEvent).detail;
+  }
+
+  private async onActionEvent(evt: Event) {
+    const action: string = (evt as CustomEvent).detail
+
+    if (this.element === "user-edit") {
+
+      if (action == "close") {
+        await this.refreshData();
+        this.navigate("./users");
+        return;
+      }
+    }
+
+    if (this.element === "certs-list") {
+      if (action == "add") {
+        await this.refreshData();
+        this.navigate("./certifications");
+        return;
+      }
+    }
   }
 
   render() {
@@ -88,36 +174,59 @@ export class OmaAmbulanceCertsApp {
       this.getRouterElements();
     }
 
-
     return (
       <Host>
-        {this.error !== "" && (
-          <div class="error"> {this.error} </div>
+        {( this.error !== "" &&
+          <div class="error">{this.error} </div>
         )}
         { this.element !== "404" && (
-          <md-tabs>
-            <md-primary-tab onClick={() => navigate("./certifications")}>Certifications</md-primary-tab>
-            <md-primary-tab onClick={() => navigate("./users")}>Users</md-primary-tab>
-          </md-tabs>
+          <div class="tabs">
+            <md-tabs>
+              <md-primary-tab onClick={() => navigate("./certifications")}>Certifications</md-primary-tab>
+              <md-primary-tab onClick={() => navigate("./users")}>Users</md-primary-tab>
+            </md-tabs>
+          </div>
         )}
         { this.element === "certs-list" && (
           <oma-ambulance-certs-list
             onerror-event={(evt) => this.onChildError(evt)}
+            onaction-event={(evt) => this.onActionEvent(evt)}
             api-base={this.apiBase}
             certification-id={this.entryId}
+            certifications={this.certificationList}
           >
           </oma-ambulance-certs-list>
         )}
         { this.element === "user-list" && (
           <oma-ambulance-certs-user-list
             api-base={this.apiBase}
-            user-id={this.entryId}
+            users={this.userList}
+            certifications={this.certificationList}
+            onentry-clicked={
+              (ev: CustomEvent<User>) => {
+                navigate("./users/" + ev.detail.id.toString());
+                this.user = ev.detail;
+              }
+            }
           >
           </oma-ambulance-certs-user-list>
+        )}
+        { this.element === "user-edit" && (
+          <oma-ambulance-certs-user-edit
+            onaction-event={(evt) => this.onActionEvent(evt)}
+            api-base={this.apiBase}
+            user={this.user}
+            certifications={this.certificationList}
+          >
+          </oma-ambulance-certs-user-edit>
         )}
         { this.element === "404" && (
           <div> 404 - Not found </div>
         )}
+
+        <div class="cat">
+          <img src="https://33.media.tumblr.com/9399e5e1fa6f95c895a501b8226121bd/tumblr_nr4f0wy65q1updbngo1_250.gif" alt="cat" />
+        </div>
       </Host>
     );
   }

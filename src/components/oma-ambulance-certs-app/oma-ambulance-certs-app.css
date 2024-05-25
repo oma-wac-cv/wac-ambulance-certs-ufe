@@ -1,3 +1,28 @@
 :host {
   display: block;
 }
+
+.tabs {
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  position: fixed;
+}
+
+.error {
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: red;
+  color: white;
+  position: fixed;
+  z-index: 3000;
+}
+
+.cat {
+  z-index: 4000;
+  bottom: -40px;
+  left: 0;
+  position: fixed;
+}

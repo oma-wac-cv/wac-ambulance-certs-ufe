@@ -1,4 +1,4 @@
-import { Component, Prop, State, Host, h } from '@stencil/core';
+import { Component, Prop, State, Event, EventEmitter, Host, h } from '@stencil/core';
 import { AmbulanceStaffCertificationsApiFactory, User, UserCertification, Certification } from '../../api/ambulance-certs';
 
 @Component({
@@ -15,202 +15,53 @@ export class OmaAmbulanceCertsUserList {
     name: "",
     certifications: []
   };
-  @State() certEdit: Certification = null;
 
-  @State() users: User[] = [];
-  @State() userCertifications: UserCertification[] = [];
-  @State() certifications: Certification[] = [];
+  @Prop() users: User[] = [];
+  @Prop() certifications: Certification[] = [];
 
-  @State() newCertSelected: Certification = null;
-
-  @State() expanded: string = "";
-  @State() elementCertSelect: string | null = null;
-
-  dialog!: any;
-  error: string = "";
-
-  private getCertFromUserCertification(userCert: any) {
-    return this.certifications.find(cert => cert.id === userCert.certification_id);
-  }
-
-  private openDialog(user: User, cert: UserCertification) {
-    this.userEdit = user;
-    this.certEdit = this.certifications.find(c => c.id === cert.certification_id);
-    this.dialog.show();
-  }
+  @Event({ eventName: "entry-clicked"}) userClicked: EventEmitter<User>;
 
   async componentWillLoad() {
-    this.users = await this.getUsers();
-    this.certifications = await this.getCertifications();
+
   }
 
-  private async getUsers(): Promise<User[]> {
-    try {
-      const api = AmbulanceStaffCertificationsApiFactory(undefined, this.apiBase);
-      const response = await api.getUsers();
-      if (response.status !== 200) {
-        this.error = `Error: ${response.statusText}`;
-        return [];
-      }
-
-      return response.data;
-    } catch (e) {
-      this.error = `Error: ${e}`;
-      return [];
-    }
-  }
-
-  private async getCertifications(): Promise<Certification[]> {
-    try {
-      const api = AmbulanceStaffCertificationsApiFactory(undefined, this.apiBase);
-      const response = await api.getCertifications();
-      if (response.status !== 200) {
-        this.error = `Error: ${response.statusText}`;
-        return [];
-      }
-
-      return response.data;
-    } catch (e) {
-      this.error = `Error: ${e}`;
-      return [];
-    }
-  }
-
-  private async saveCert() {
-    if (!this.userEdit) {
-      return;
-    }
-    const api = AmbulanceStaffCertificationsApiFactory(undefined, this.apiBase);
-
-    let editedUser: User = JSON.parse(JSON.stringify(this.userEdit));
-    editedUser.certifications = JSON.parse(JSON.stringify(this.userCertifications));
-
-    const response = await api.updateUser(editedUser.id, editedUser);
-    if (response.status !== 200) {
-      this.error = `Error: ${response.statusText}`;
-      return;
-    }
-    this.users = await this.getUsers();
-    this.dialog.close();
+  private getCertFromUserCertification(userCert: any): Certification {
+    let cert: Certification = this.certifications.find(cert => cert.id === userCert.certification_id);
+    return cert;
   }
 
   render() {
-    if (this.error) {
-      return (
-        <Host>
-          <div class="error">{this.error}</div>;
-        </Host>
-      );
-    }
     return (
       <Host>
-        {this.error && <div class="error">{this.error}</div>}
-        <md-list>
-          {this.users.map(user =>
-            <md-list-item>
-              <div slot="headline">{user.name}</div>
-              <div slot="supporting-text">
-                <md-chip-set>
-                  {user.certifications.map(cert =>
-                    <md-assist-chip
-                      always-focusable
-                      disabled
-                      onClick={() => this.openDialog(user, cert)}
-                      label={this.getCertFromUserCertification(cert).name || "Unknown"}>
-                    </md-assist-chip>
-                  )}
-                </md-chip-set>
-              </div>
-              <md-icon slot="start">person</md-icon>
-              <md-filled-tonal-icon-button slot="end"
-                onClick={() => {
-                  this.dialog?.show();
-                  this.userEdit = user;
-                  this.userCertifications = user.certifications;
-                }}>
-                <md-icon>edit</md-icon>
-              </md-filled-tonal-icon-button>
-            </md-list-item>
-          )}
-        </md-list>
-
-        <md-dialog ref={(el) => this.dialog = el as any } >
-          <div slot="headline">
-            Editing user <b>{this.userEdit?.name}</b>
-          </div>
-          <div slot="content">
-            <md-outlined-select
-              label="Select certification"
-              value={this.elementCertSelect}
-              oninput={(e) => {
-                this.newCertSelected = this.certifications.find(
-                  cert => cert.id === (e.target as HTMLSelectElement).value
-                );
-                this.elementCertSelect = (e.target as HTMLSelectElement).value;
-                }
-              }
-            >{this.certifications.map(cert =>
-                <md-select-option value={cert.id}>
-                  <div slot="headline">{cert.name}</div>
-                </md-select-option>
-              )}
-            </md-outlined-select>
-
-            <md-filled-tonal-icon-button
-              onClick={() => {
-                if (!this.newCertSelected || this.userCertifications.find(uc => uc.certification_id === this.newCertSelected.id)) {
-                  return;
-                }
-                this.userCertifications.push({
-                  certification_id: this.newCertSelected.id,
-                  issued_at: "",
-                  expires_at: ""
-                });
-                this.elementCertSelect = null;
-              }}
-            >
-              <md-icon>add</md-icon>
-            </md-filled-tonal-icon-button>
-
-            <md-list>
-              {this.userCertifications.map(cert =>
-                <md-list-item>
-                  <div slot="headline">{this.getCertFromUserCertification(cert).name}</div>
-                  <div slot="supporting-text">
-                    {this.getCertFromUserCertification(cert).description}
-
-                    <br></br>
-                    <br></br>
-                    <md-outlined-text-field label="Issued at"
-                      value={cert.issued_at}
-                      oninput={(e) => cert.issued_at = (e.target as HTMLInputElement).value}
-                    ></md-outlined-text-field>
-                    <br></br>
-                    <md-outlined-text-field label="Expires at"
-                      value={cert.expires_at}
-                      oninput={(e) => cert.expires_at = (e.target as HTMLInputElement).value}
-                    ></md-outlined-text-field>
-                    <br></br>
-
-                    <md-filled-tonal-icon-button
-                      onClick={() => {
-                        this.userCertifications = this.userCertifications.filter(
-                          c => c.certification_id !== cert.certification_id
-                        );
-                      }}
-                    >
-                      <md-icon>close</md-icon>
-                    </md-filled-tonal-icon-button>
-                  </div>
-                </md-list-item>
-              )}
-            </md-list>
-          </div>
-          <div slot="actions">
-            <md-text-button onClick={() => this.dialog?.close()}>Cancel</md-text-button>
-            <md-text-button onClick={() => this.saveCert()} >OK</md-text-button>
-          </div>
-        </md-dialog>
+        <div class="mylist">
+          <md-list>
+            {this.users.map(user =>
+              <md-list-item>
+                <div slot="headline">{user.name}</div>
+                <div slot="supporting-text">
+                  <md-chip-set>
+                    {user.certifications.filter(uc=> this.certifications.find(c => c.id == uc.certification_id)).map(cert =>
+                      <md-assist-chip
+                        always-focusable
+                        disabled
+                        label={this.getCertFromUserCertification(cert).name || "Unknown"}>
+                      </md-assist-chip>
+                    )}
+                  </md-chip-set>
+                </div>
+                <md-icon slot="start">person</md-icon>
+                <md-filled-tonal-button slot="end"
+                  onClick={() => {
+                    this.userClicked.emit(user);
+                    this.userEdit = user;
+                  }}>
+                  Edit
+                  <md-icon slot="icon">edit</md-icon>
+                </md-filled-tonal-button>
+              </md-list-item>
+            )}
+          </md-list>
+        </div>
       </Host>
     );
   }
