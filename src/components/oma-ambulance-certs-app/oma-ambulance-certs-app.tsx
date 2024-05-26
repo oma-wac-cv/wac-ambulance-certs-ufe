@@ -225,7 +225,7 @@ export class OmaAmbulanceCertsApp {
         )}
 
         <div class="cat">
-          <img src="/assets/cat.gif" alt="cat" />
+          <img src="/assets/cat.gif"/>
         </div>
       </Host>
     );

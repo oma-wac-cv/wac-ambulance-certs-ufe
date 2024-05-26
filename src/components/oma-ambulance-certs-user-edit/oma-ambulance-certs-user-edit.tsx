@@ -103,10 +103,17 @@ export class OmaAmbulanceCertsUserEdit {
             <md-list>
               {this.userEdit.certifications?.filter(uc => this.certifications.find(c=>c.id ===uc.certification_id)).map(cert =>
                 <md-list-item class="cert-item">
-                  <div slot="headline"> <span class="subtitle">Name: </span> {this.getCertFromUserCertification(cert).name}</div>
+                  <div slot="headline">
+                    <span class="subtitle">Name: </span>
+                    <div class="title-text"> 
+                      {this.getCertFromUserCertification(cert).name}
+                    </div>
+                    </div>
                   <div slot="supporting-text">
                     <span class="subtitle">Description: </span>
-                    {this.getCertFromUserCertification(cert).description}
+                    <div class="desc-text">
+                      {this.getCertFromUserCertification(cert).description}
+                    </div>
                     <div class="cert-item-dates">
                       <md-filled-text-field label="Issued at"
                         class="1"
